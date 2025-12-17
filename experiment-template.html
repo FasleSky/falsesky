@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Experiment Title | My Interactive Lab</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #0d0f14;
+            color: #e5e7eb;
+            min-height: 100vh;
+        }
+
+        .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 60px;
+
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(10px);
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    z-index: 30;
+}
+
+        .logo {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #ffffff;
+
+    font-family: "Segoe UI", "Poppins", "Inter", Arial, sans-serif;
+}
+
+        .nav-links a {
+            margin-left: 30px;
+            text-decoration: none;
+            color: #cbd5e1;
+            font-size: 15px;
+        }
+
+        .nav-links a:hover {
+            color: #ffffff;
+        }
+
+        .content {
+            padding: 60px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .experiment-box {
+            margin-top: 40px;
+            padding: 80px;
+            border: 1px dashed #374151;
+            text-align: center;
+            color: #9ca3af;
+        }
+        /* FORCE LOGO VISIBILITY IN NAVBAR */
+.navbar .logo {
+    color: #ffffff !important;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    font-family: "Poppins", "Inter", "Segoe UI", Arial, sans-serif;
+}
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="logo">FALSE REALM</div>
+
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="experiments.html">Experiments</a>
+        </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+        <h1>Experiment Title</h1>
+        <p>
+            Short description of what this experiment does.
+        </p>
+
+        <div class="experiment-box">
+            Experiment runs here
+        </div>
+    </div>
+
+</body>
+</html>
