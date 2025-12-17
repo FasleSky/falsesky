@@ -105,6 +105,11 @@
     transition: top 0.5s ease, left 0.5s ease;
     z-index: 5;
 }
+@media (hover: none) {
+    .word.bad {
+        transition: top 0.15s ease-out, left 0.15s ease-out;
+    }
+}
 
 .word.good {
     background: #ffffff;
@@ -244,6 +249,10 @@
         <p>SAME TO YOU <span class="wiggle-emoji">💖</span></p>
     </div>
 </div>
+<div class="question-card">
+    <h1>What do you think of the person who sent you this link?</h1>
+    <p>BE A GOOD PERSON AND THINK NICELY.</p>
+</div>
 <script>
     /* -------------------------
        BAD WORDS RUN AWAY LOGIC
@@ -251,15 +260,34 @@
 
     const badWords = document.querySelectorAll(".word.bad");
 
-    badWords.forEach(word => {
-        word.addEventListener("mouseenter", () => {
-            const randomTop = Math.random() * 80 + 10;
-            const randomLeft = Math.random() * 80 + 10;
+// Detect if device supports hover (desktop)
+const supportsHover = window.matchMedia("(hover: hover)").matches;
 
-            word.style.top = randomTop + "%";
-            word.style.left = randomLeft + "%";
+badWords.forEach(word => {
+
+    if (supportsHover) {
+        // DESKTOP: move on hover
+        word.addEventListener("mouseenter", () => {
+            moveWordFar(word);
         });
-    });
+    } else {
+        // MOBILE: move on touch
+        word.addEventListener("touchstart", (e) => {
+            e.preventDefault(); // prevent accidental clicks
+            moveWordFar(word);
+        });
+    }
+
+});
+
+// shared movement logic
+function moveWordFar(word) {
+    const randomTop = Math.random() * 80 + 10;
+    const randomLeft = Math.random() * 80 + 10;
+
+    word.style.top = randomTop + "%";
+    word.style.left = randomLeft + "%";
+}
 
 
     /* -------------------------
