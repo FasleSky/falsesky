@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>What Do You Think? | False Realm</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+    font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh;
+    margin: 0;
+    overflow: hidden;
+
+    background: radial-gradient(
+        circle at top left,
+        #ff9a9e,
+        #fad0c4,
+        #fbc2eb,
+        #a6c1ee
+    );
+
+    color: #111827;
+}
+
+        .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 60px;
+
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(10px);
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    z-index: 30;
+}
+
+        .logo {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #ffffff;
+
+    font-family: "Segoe UI", "Poppins", "Inter", Arial, sans-serif;
+}
+
+        .nav-links a {
+            margin-left: 30px;
+            text-decoration: none;
+            color: #cbd5e1;
+            font-size: 15px;
+        }
+
+        .nav-links a:hover {
+            color: #ffffff;
+        }
+
+        .question-card {
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ffffff;
+    padding: 20px 30px;
+    border-radius: 16px;
+    text-align: center;
+    max-width: 700px;
+    z-index: 20;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.question-card h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.question-card p {
+    margin-top: 6px;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+        .experiment-box {
+            margin-top: 40px;
+            padding: 80px;
+            border: 1px dashed #374151;
+            text-align: center;
+            color: #9ca3af;
+        }
+        .word {
+    position: absolute;
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+
+    transition: top 0.5s ease, left 0.5s ease;
+    z-index: 5;
+}
+@media (hover: none) {
+    .word.bad {
+        transition: top 0.15s ease-out, left 0.15s ease-out;
+    }
+}
+
+.word.good {
+    background: #ffffff;
+    color: #111827;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.word.good:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.2);
+}
+
+.word.good:active {
+    transform: scale(0.96);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.word.bad {
+    background: #111827;
+    color: #ffffff;
+}
+/* POPUP STYLES */
+#popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+
+    background: rgba(0, 0, 0, 0.35);
+    display: none;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 50;
+        transition: background 0.35s ease;
+}
+
+.popup-card {
+    position: relative;
+    background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
+    padding: 50px 60px;
+    border-radius: 26px;
+    text-align: center;
+    max-width: 480px;
+    width: 90%;
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.35);
+
+    /* 3D animation setup */
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.popup-card.show {
+    opacity: 1;
+    transform: translateY(0) scale(1.02);
+}
+
+.popup-card h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.popup-card p {
+    margin-top: 12px;
+    font-size: 16px;
+    color: #1f2937;
+}
+.popup-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 26px;
+    font-weight: bold;
+    color: #374151;
+    cursor: pointer;
+}
+
+.popup-close:hover {
+    color: #111827;
+}
+/* FORCE LOGO VISIBILITY IN NAVBAR */
+.navbar .logo {
+    color: #ffffff !important;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    font-family: "Poppins", "Inter", "Segoe UI", Arial, sans-serif;
+}
+/* EMOJI WIGGLE */
+.wiggle-emoji {
+    display: inline-block;
+    animation: emojiWiggle 1.6s ease-in-out infinite;
+    transform-origin: center;
+}
+
+@keyframes emojiWiggle {
+    0%   { transform: rotate(0deg) scale(1); }
+    25%  { transform: rotate(5deg) scale(1.05); }
+    50%  { transform: rotate(0deg) scale(1); }
+    75%  { transform: rotate(-5deg) scale(1.05); }
+    100% { transform: rotate(0deg) scale(1); }
+}
+
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="logo">FALSE REALM</div>
+
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="experiments.html">Experiments</a>
+        </div>
+    </div>
+<div class="word good" style="top: 40%; left: 20%;">AWESOME</div>
+<div class="word good" style="top: 60%; left: 65%;">HANDSOME</div>
+<div class="word good" style="top: 75%; left: 35%;">BOMBASTIC</div>
+
+<div class="word bad" style="top: 45%; left: 55%;">POOR</div>
+<div class="word bad" style="top: 65%; left: 15%;">UGLY</div>
+<div class="word bad" style="top: 80%; left: 60%;">IDIOT</div>
+<div class="word bad" style="top: 55%; left: 80%;">DUMB</div>
+
+<div id="popup-overlay">
+    <div class="popup-card">
+        <button class="popup-close">&times;</button>
+
+        <h2>THANK YOU FOR THINKING SO HIGHLY OF ME</h2>
+        <p>SAME TO YOU <span class="wiggle-emoji">💖</span></p>
+    </div>
+</div>
+<div class="question-card">
+    <h1>What do you think of the person who sent you this link?</h1>
+    <p>BE A GOOD PERSON AND THINK NICELY.</p>
+</div>
+<script>
+    /* -------------------------
+       BAD WORDS RUN AWAY LOGIC
+    -------------------------- */
+
+    const badWords = document.querySelectorAll(".word.bad");
+
+// Detect if device supports hover (desktop)
+const supportsHover = window.matchMedia("(hover: hover)").matches;
+
+badWords.forEach(word => {
+
+    if (supportsHover) {
+        // DESKTOP: move on hover
+        word.addEventListener("mouseenter", () => {
+            moveWordFar(word);
+        });
+    } else {
+        // MOBILE: move on touch
+        word.addEventListener("touchstart", (e) => {
+            e.preventDefault(); // prevent accidental clicks
+            moveWordFar(word);
+        });
+    }
+
+});
+
+// shared movement logic
+function moveWordFar(word) {
+    const randomTop = Math.random() * 80 + 10;
+    const randomLeft = Math.random() * 80 + 10;
+
+    word.style.top = randomTop + "%";
+    word.style.left = randomLeft + "%";
+}
+
+
+    /* -------------------------
+       GOOD WORDS POPUP LOGIC
+    -------------------------- */
+
+    const goodWords = document.querySelectorAll(".word.good");
+    const popupOverlay = document.getElementById("popup-overlay");
+    const popupCard = document.querySelector(".popup-card");
+    const closeBtn = document.querySelector(".popup-close");
+
+    goodWords.forEach(word => {
+    word.addEventListener("click", () => {
+        popupOverlay.style.display = "flex";
+
+        // allow overlay to render first
+        setTimeout(() => {
+            popupCard.classList.add("show");
+        }, 10);
+    });
+});
+
+    // Close popup when clicking outside the card
+    popupOverlay.addEventListener("click", () => {
+        popupCard.classList.remove("show");
+
+setTimeout(() => {
+    popupOverlay.style.display = "none";
+}, 300);
+
+    });
+
+    // Prevent closing when clicking inside the card
+    popupCard.addEventListener("click", (e) => {
+        e.stopPropagation();
+    });
+
+    // Close button
+    closeBtn.addEventListener("click", () => {
+        popupCard.classList.remove("show");
+
+setTimeout(() => {
+    popupOverlay.style.display = "none";
+}, 300);
+    });
+</script>
+
+</body>
+</html>
