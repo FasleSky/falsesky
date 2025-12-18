@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>About | False Realm</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Inter", "Poppins", Arial, sans-serif;
+            background-color: #0d0f14;
+            color: #e5e7eb;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 60px;
+            background-color: #0b0d12;
+            border-bottom: 1px solid #1f2933;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: #ffffff;
+        }
+
+        .nav-links a {
+            margin-left: 30px;
+            text-decoration: none;
+            color: #cbd5e1;
+            font-size: 15px;
+        }
+
+        .nav-links a:hover {
+            color: #ffffff;
+        }
+
+        .about-container {
+            max-width: 900px;
+            margin: 80px auto;
+            padding: 0 30px;
+        }
+
+        .about-container h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .about-container p {
+            font-size: 18px;
+            line-height: 1.7;
+            color: #d1d5db;
+            margin-bottom: 20px;
+        }
+        /* ABOUT ENVELOPE WRAPPER */
+.about-wrapper {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+/* ENVELOPE CARD */
+.envelope {
+    background: linear-gradient(
+        135deg,
+        #fbc2eb,
+        #a6c1ee,
+        #fad0c4
+    );
+    border-radius: 28px;
+    max-width: 850px;
+    width: 100%;
+    padding: 0;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+/* ENVELOPE HEADER (FLAP FEEL) */
+.envelope-header {
+    background: rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(8px);
+    padding: 26px 32px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.envelope-header span {
+    font-size: 28px;
+}
+
+.envelope-header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #111827;
+}
+
+/* LETTER BODY */
+.envelope-body {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 40px 36px;
+}
+
+.envelope-body p {
+    font-size: 18px;
+    line-height: 1.8;
+    color: #1f2937;
+}
+/* FEEDBACK SECTION */
+.feedback-section {
+    margin-top: 50px;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 24px;
+    backdrop-filter: blur(10px);
+}
+
+.feedback-section h2 {
+    margin-bottom: 16px;
+    color: #111827;
+}
+
+#feedback-input {
+    width: 100%;
+    min-height: 90px;
+    border-radius: 18px;
+    border: none;
+    padding: 14px;
+    font-size: 15px;
+    resize: none;
+    outline: none;
+    margin-bottom: 12px;
+}
+
+#feedback-btn {
+    padding: 10px 24px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(135deg, #a6c1ee, #fbc2eb);
+    font-weight: 600;
+}
+
+#feedback-list {
+    margin-top: 24px;
+}
+
+.feedback-item {
+    background: rgba(255, 255, 255, 0.85);
+    padding: 14px 18px;
+    border-radius: 16px;
+    margin-bottom: 10px;
+    color: #1f2937;
+    font-size: 14px;
+}
+
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="logo">False Realm</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="experiments.html">Experiments</a>
+            <a href="about.html">About</a>
+        </div>
+    </div>
+
+    <!-- ABOUT CONTENT -->
+    <div class="about-wrapper">
+    <div class="envelope">
+        <div class="envelope-header">
+            <span>✉️</span>
+            <h1>About False Realm</h1>
+        </div>
+
+        <div class="envelope-body">
+             <p>
+            <!-- ✏️ WRITE YOUR WORDS HERE -->
+            Hello There! 👋, Thank You for visting False Realm.
+            False Realm is my personal space where I create, Design, Edit and Re edit 
+            my creative imagination (with limitaions) such as programs, simulations,
+            visual animations.
+            Now whatever you see here is what I have created with every ounce of my 
+            knowledge and efforts and hence i would like you to appriciate this work. 
+
+        </p>
+       <p>
+            <!-- ✏️ WRITE YOUR WORDS HERE -->
+          False Realme is just in its beginner static phase so it may not meet up to your
+            expectations but I am working on its development will try to meet my expectation first
+            (obviously why would I will try to meet your expectation first?).
+
+        </p>
+<p>
+            <!-- ✏️ WRITE YOUR WORDS HERE --> 
+            So till then stay updated and do remember to drop your feedback with all you honest 
+            thoughts.
+
+        </p>
+<p>
+            <!-- ✏️ WRITE YOUR WORDS HERE -->
+            Ankit
+        </p>
+        <p>
+            <!-- ✏️ WRITE YOUR WORDS HERE -->
+           False Sky
+
+        </p>
+        </div>
+        <!-- FEEDBACK SECTION -->
+<div class="feedback-section">
+    <h2>Leave a Feedback</h2>
+
+    <textarea id="feedback-input" placeholder="Write something kind, honest, or constructive..."></textarea>
+
+    <button id="feedback-btn">Submit</button>
+
+    <div id="feedback-list"></div>
+</div>
+
+    </div>
+</div>
+<script>
+    const input = document.getElementById("feedback-input");
+    const button = document.getElementById("feedback-btn");
+    const list = document.getElementById("feedback-list");
+
+    const MAX_FEEDBACK = 10;
+
+    // Load existing feedback
+    let feedbacks = JSON.parse(localStorage.getItem("feedbacks")) || [];
+
+    function renderFeedback() {
+        list.innerHTML = "";
+        feedbacks.slice().reverse().forEach(text => {
+            const div = document.createElement("div");
+            div.className = "feedback-item";
+            div.textContent = text;
+            list.appendChild(div);
+        });
+    }
+
+    renderFeedback();
+
+    button.addEventListener("click", () => {
+        const text = input.value.trim();
+        if (!text) return;
+
+        feedbacks.push(text);
+
+        if (feedbacks.length > MAX_FEEDBACK) {
+            feedbacks.shift(); // remove oldest
+        }
+
+        localStorage.setItem("feedbacks", JSON.stringify(feedbacks));
+        input.value = "";
+        renderFeedback();
+    });
+</script>
+
+</body>
+</html>
