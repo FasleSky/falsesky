@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Interactive Lab</title>
 
     <style>
@@ -68,12 +69,12 @@
         }
 
         .hero h1 {
-            font-size: 48px;
+            font-size: clamp(28px, 6vw, 48px);
             margin-bottom: 20px;
         }
 
         .hero p {
-            font-size: 18px;
+            font-size: clamp(14px, 4vw, 18px);
             color: #9ca3af;
             max-width: 600px;
             margin-bottom: 40px;
@@ -253,6 +254,21 @@ body::before {
     z-index: -1;
     pointer-events: none;
 }
+/* MOBILE CONTENT SPACING FIX */
+.content {
+    padding-left: 20px;
+    padding-right: 20px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+/* MOBILE HERO BUTTON SIZE */
+@media (max-width: 600px) {
+    .content a {
+        padding: 14px 28px;
+        font-size: 15px;
+    }
+}
 
     </style>
 </head>
@@ -306,7 +322,7 @@ const COUNT = 320;
 for (let i = 0; i < COUNT; i++) {
     particles.push({
         t: Math.random() * Math.PI * 2,
-        speed: 0.004 + Math.random() * 0.004,
+        speed: (window.innerWidth < 600 ? 0.002 : 0.004) + Math.random() * 0.003,
         offset: Math.random() * Math.PI * 2,
         depth: Math.random()
     });
@@ -323,7 +339,8 @@ function animate() {
 
     const cx = canvas.width / 2;
     const cy = canvas.height / 2;
-    const scale = Math.min(canvas.width, canvas.height) * 0.32;
+    const baseScale = Math.min(canvas.width, canvas.height);
+const scale = baseScale * (window.innerWidth < 600 ? 0.45 : 0.32);
 
     for (const p of particles) {
         p.t += p.speed;
@@ -342,7 +359,7 @@ const y = cy + rotatedY * depthScale;
 
         ctx.beginPath();
         ctx.arc(x, y, 1.2 * depthScale, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,255,${0.28 * depthScale})`;
+        ctx.fillStyle = `rgba(255,255,255,${0.7 * depthScale})`;
         ctx.fill();
     }
 
