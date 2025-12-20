@@ -1,248 +1,268 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Experiment 1 – Mobile Hand Magic</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobile Experiment 1</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        canvas { display: block; touch-action: none; }
 
-<style>
-html, body {
-  margin: 0;
-  padding: 0;
-  background: #000;
-  overflow: hidden;
-  font-family: system-ui;
-  touch-action: none;
-}
+        #popup-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 100; padding: 20px; box-sizing: border-box;
+        }
 
-canvas {
-  position: fixed;
-  inset: 0;
-}
+        #guidance-pop {
+            position: relative;
+            background: #1a1a2e;
+            padding: 30px; border-radius: 25px;
+            text-align: center; color: white;
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 300px; width: 100%;
+        }
 
-/* Popup */
-#popup {
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle, #111, #000);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-}
+        #guidance-pop h2 { margin: 0; font-weight: 400; font-size: 1.5rem; }
+        #guidance-pop p { color: #00d4ff; margin: 15px 0 25px; font-size: 1rem; }
 
-.popup-box {
-  background: #111;
-  color: white;
-  padding: 32px 40px;
-  border-radius: 18px;
-  text-align: center;
-  box-shadow: 0 0 40px rgba(0,255,255,0.3);
-  position: relative;
-}
+        #close-btn {
+            position: absolute; top: 15px; right: 15px;
+            background: #333; border: none; color: white;
+            width: 30px; height: 30px; border-radius: 50%;
+            font-size: 18px; cursor: pointer;
+        }
 
-.popup-box h1 {
-  font-size: 22px;
-  font-weight: 500;
-  background: linear-gradient(90deg,#ff7af5,#7afcff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-#closeBtn {
-  position: absolute;
-  top: 10px;
-  right: 14px;
-  font-size: 20px;
-  background: none;
-  border: none;
-  color: white;
-}
-
-#hint {
-  position: fixed;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: #0ff;
-  font-size: 13px;
-  opacity: 0.8;
-}
-
-video { display: none; }
-</style>
+        #video-input { display: none; }
+        
+        /* Loading indicator for mobile data */
+        #loader {
+            position: fixed; bottom: 20px; left: 50%;
+            transform: translateX(-50%); color: rgba(255,255,255,0.5);
+            font-size: 12px; pointer-events: none;
+        }
+    </style>
 </head>
-
 <body>
 
-<div id="popup">
-  <div class="popup-box">
-    <button id="closeBtn">✕</button>
-    <h1>Show hand gesture to see magic</h1>
-  </div>
-</div>
+    <div id="popup-overlay">
+        <div id="guidance-pop">
+            <button id="close-btn">✕</button>
+            <h2>Experiment 1</h2>
+            <p>Show hand gesture to see magic</p>
+            <small style="opacity: 0.6">Use front camera in a bright room</small>
+        </div>
+    </div>
 
-<div id="hint">Move hand or touch screen</div>
+    <div id="loader">Initializing Camera...</div>
+    <video id="video-input" playsinline></video>
 
-<video id="video" autoplay playsinline></video>
-<canvas id="canvas"></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script>
+let scene, camera, renderer, particles, geometry;
+const particleCount = 6000;
+let targetPositions = [];
+let currentShapeIndex = 0;
+const videoElement = document.getElementById('video-input');
 
-<script>
-/* ---------- MOBILE DETECTION ---------- */
-const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+function initThree() {
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 5;
 
-/* ---------- THREE SETUP ---------- */
-const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
-renderer.setSize(innerWidth, innerHeight);
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); 
+    document.body.appendChild(renderer.domElement);
 
-const scene = new THREE.Scene();
-const camera3D = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 400);
-camera3D.position.z = 110;
+    geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
 
-/* ---------- PARTICLES ---------- */
-const COUNT = 3500; // mobile-safe
-const geo = new THREE.BufferGeometry();
-const pos = new Float32Array(COUNT*3);
-const col = new Float32Array(COUNT*3);
-
-let shapeIndex = 0;
-
-function makeShape(type){
-  for(let i=0;i<COUNT;i++){
-    let t = Math.random()*Math.PI*2;
-    let r = Math.random()*30;
-    let x=0,y=0,z=0;
-
-    if(type===0){ // Heart
-      x = 14*Math.pow(Math.sin(t),3);
-      y = 11*Math.cos(t)-4*Math.cos(2*t);
-      z = (Math.random()-0.5)*8;
-    }
-    else if(type===1){ // Ring
-      x = Math.cos(t)*r;
-      y = Math.sin(t)*r*0.3;
-      z = Math.sin(t)*r;
-    }
-    else{ // Cloud
-      x=(Math.random()-0.5)*70;
-      y=(Math.random()-0.5)*70;
-      z=(Math.random()-0.5)*70;
+    for (let i = 0; i < particleCount * 3; i++) {
+        positions[i] = (Math.random() - 0.5) * 10;
+        colors[i] = Math.random();
     }
 
-    pos[i*3]=x;
-    pos[i*3+1]=y;
-    pos[i*3+2]=z;
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-    col[i*3]=Math.random();
-    col[i*3+1]=Math.random();
-    col[i*3+2]=Math.random();
-  }
-  geo.attributes.position.needsUpdate=true;
+    const material = new THREE.PointsMaterial({
+        size: 0.04,
+        vertexColors: true,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+    });
+
+    particles = new THREE.Points(geometry, material);
+    scene.add(particles);
+
+    createShapes();
+    animate();
 }
 
-geo.setAttribute("position",new THREE.BufferAttribute(pos,3));
-geo.setAttribute("color",new THREE.BufferAttribute(col,3));
-makeShape(0);
+function createShapes() {
+    targetPositions = [
+        getSphereData(),
+        getHeartData(),
+        getSaturnData(),
+        getInfinityData()
+    ];
+}
 
-const mat = new THREE.PointsMaterial({
-  size: 1.9,
-  vertexColors:true,
-  blending: THREE.NormalBlending
-});
+/* ---- SHAPE FUNCTIONS UNCHANGED ---- */
+function getSphereData() { /* same as yours */ 
+    const arr = new Float32Array(particleCount * 3);
+    for(let i=0;i<particleCount;i++){
+        const phi=Math.acos(-1+(2*i)/particleCount);
+        const theta=Math.sqrt(particleCount*Math.PI)*phi;
+        arr[i*3]=2.5*Math.cos(theta)*Math.sin(phi);
+        arr[i*3+1]=2.5*Math.sin(theta)*Math.sin(phi);
+        arr[i*3+2]=2.5*Math.cos(phi);
+    }
+    return arr;
+}
 
-const points = new THREE.Points(geo,mat);
-scene.add(points);
+function getHeartData() {
+    const arr = new Float32Array(particleCount * 3);
+    for(let i=0;i<particleCount;i++){
+        const t=Math.random()*Math.PI*2;
+        arr[i*3]=0.18*(16*Math.pow(Math.sin(t),3));
+        arr[i*3+1]=0.18*(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));
+        arr[i*3+2]=(Math.random()-0.5)*0.5;
+    }
+    return arr;
+}
 
-/* ---------- CONTROL VARIABLES ---------- */
-let targetX=0, targetY=0;
-let scale=1;
-let lastSwitch=0;
+function getSaturnData() {
+    const arr = new Float32Array(particleCount * 3);
+    for(let i=0;i<particleCount;i++){
+        if(i<particleCount*0.4){
+            const r=Math.random()*1.5;
+            const th=Math.random()*Math.PI*2;
+            const ph=Math.random()*Math.PI;
+            arr[i*3]=r*Math.sin(ph)*Math.cos(th);
+            arr[i*3+1]=r*Math.sin(ph)*Math.sin(th);
+            arr[i*3+2]=r*Math.cos(ph);
+        } else {
+            const r=2.8+Math.random()*1.2;
+            const th=Math.random()*Math.PI*2;
+            arr[i*3]=r*Math.cos(th);
+            arr[i*3+1]=(Math.random()-0.5)*0.3;
+            arr[i*3+2]=r*Math.sin(th);
+        }
+    }
+    return arr;
+}
 
-/* ---------- HAND TRACKING ---------- */
+function getInfinityData() {
+    const arr = new Float32Array(particleCount * 3);
+    for(let i=0;i<particleCount;i++){
+        const t=(i/particleCount)*Math.PI*2;
+        const s=3.5/(3-Math.cos(2*t));
+        arr[i*3]=s*Math.cos(t);
+        arr[i*3+1]=s*Math.sin(2*t)/2;
+        arr[i*3+2]=(Math.random()-0.5)*0.5;
+    }
+    return arr;
+}
+
+function morphTo(index) {
+    const posAttr = geometry.attributes.position;
+    const target = targetPositions[index];
+
+    gsap.to(posAttr.array, {
+        endArray: target,
+        duration: 1.4,
+        ease: "power2.out",
+        onUpdate: () => posAttr.needsUpdate = true
+    });
+
+    const colAttr = geometry.attributes.color;
+    const h = (index * 90) % 360;
+    const c = new THREE.Color(`hsl(${h},80%,60%)`);
+    for(let i=0;i<particleCount;i++){
+        colAttr.array[i*3]=c.r;
+        colAttr.array[i*3+1]=c.g;
+        colAttr.array[i*3+2]=c.b;
+    }
+    colAttr.needsUpdate=true;
+}
+
+/* ---- HAND TRACKING FIX ---- */
 const hands = new Hands({
-  locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
+    locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
 });
 
 hands.setOptions({
-  maxNumHands:1,
-  modelComplexity:0,
-  minDetectionConfidence:0.6,
-  minTrackingConfidence:0.6
+    maxNumHands: 1,
+    modelComplexity: 0,
+    minDetectionConfidence: 0.6,
+    minTrackingConfidence: 0.6,
+    selfieMode: true
 });
 
-hands.onResults(res=>{
-  if(!res.multiHandLandmarks) return;
+let lastMorphTime = 0;
 
-  const lm = res.multiHandLandmarks[0];
-  targetX = (lm[9].x-0.5)*180;
-  targetY = (0.5-lm[9].y)*180;
+hands.onResults(res => {
+    document.getElementById('loader').style.display = 'none';
+    if(!res.multiHandLandmarks?.length) return;
 
-  const pinch = Math.abs(lm[4].x-lm[8].x);
-  scale = THREE.MathUtils.clamp(pinch*6,0.9,3);
+    const hand = res.multiHandLandmarks[0];
 
-  const now = performance.now();
-  if(pinch>0.28 && now-lastSwitch>1000){
-    shapeIndex=(shapeIndex+1)%3;
-    makeShape(shapeIndex);
-    lastSwitch=now;
-  }
+    const x = (hand[8].x - 0.5) * -12;
+    const y = (hand[8].y - 0.5) * -12;
+
+    particles.position.x += (x - particles.position.x) * 0.15;
+    particles.position.y += (y - particles.position.y) * 0.15;
+
+    // ✅ PINCH GESTURE (STABLE ON MOBILE)
+    const pinch = Math.abs(hand[4].x - hand[8].x);
+    const now = Date.now();
+
+    if (pinch < 0.035 && now - lastMorphTime > 1500) {
+        currentShapeIndex = (currentShapeIndex + 1) % targetPositions.length;
+        morphTo(currentShapeIndex);
+        lastMorphTime = now;
+    }
 });
 
-/* ---------- TOUCH FALLBACK ---------- */
-let touchMode=false;
-
-addEventListener("touchstart",e=>{
-  touchMode=true;
-  targetX=(e.touches[0].clientX/innerWidth-0.5)*200;
-  targetY=(0.5-e.touches[0].clientY/innerHeight)*200;
+/* ---- CAMERA START FIX ---- */
+const cameraFeed = new Camera(videoElement, {
+    onFrame: async () => {
+        if (videoElement.readyState >= 2) {
+            await hands.send({ image: videoElement });
+        }
+    },
+    facingMode: 'user',
+    width: 480,
+    height: 480
 });
 
-addEventListener("touchmove",e=>{
-  targetX=(e.touches[0].clientX/innerWidth-0.5)*200;
-  targetY=(0.5-e.touches[0].clientY/innerHeight)*200;
-});
-
-/* ---------- CAMERA ---------- */
-const video=document.getElementById("video");
-let cam;
-
-document.getElementById("closeBtn").onclick=()=>{
-  document.getElementById("popup").style.display="none";
-
-  cam=new Camera(video,{
-    onFrame:async()=>await hands.send({image:video}),
-    width:480,
-    height:360
-  });
-
-  cam.start();
-  animate();
+document.getElementById('close-btn').onclick = () => {
+    document.getElementById('popup-overlay').style.display = 'none';
+    initThree();
+    cameraFeed.start();
 };
 
-/* ---------- LOOP ---------- */
-function animate(){
-  requestAnimationFrame(animate);
-
-  points.position.x += (targetX-points.position.x)*0.1;
-  points.position.y += (targetY-points.position.y)*0.1;
-
-  mat.size=scale*2;
-  points.rotation.y+=0.002;
-
-  renderer.render(scene,camera3D);
+function animate() {
+    requestAnimationFrame(animate);
+    particles.rotation.y += 0.005;
+    renderer.render(scene, camera);
 }
 
-onresize=()=>{
-  camera3D.aspect=innerWidth/innerHeight;
-  camera3D.updateProjectionMatrix();
-  renderer.setSize(innerWidth,innerHeight);
+window.onresize = () => {
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
 };
 </script>
-
 </body>
 </html>
