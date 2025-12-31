@@ -41,10 +41,10 @@ let ctx=canvas.getContext("2d");
 let birdImg=new Image();
 let bg=new Image(); bg.src=bgSrc;
 
-let birdHitbox = 18;   // collision box (unchanged small size)
-let birdDisplay = 125;  // visual size (increase or tune later)
-let birdX=100,birdY=250,vel=0,gravity=0.35,lift=-5.1;
-let liftMobile = -9;   // more powerful tap jump
+let birdHitbox = 15;   // collision box (unchanged small size)
+let birdDisplay = 120;  // visual size (increase or tune later)
+let birdX=100,birdY=250,vel=0,gravity=0.39,lift=-5.1;
+let liftMobile = -8.7;   // more powerful tap jump
 let pipes=[],score=0,run=false,bird=0;
 
 /* --- UI BUTTONS --- */
@@ -147,6 +147,7 @@ function end(){
     run=false;
     over.style.display="block";
 }
+
 
 
 
