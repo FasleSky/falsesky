@@ -127,16 +127,14 @@ function jump(power){
 
     vel = power;
 
-    // Play sound for selected bird
-    try{
-        birdSounds[bird].pause();
-        birdSounds[bird].currentTime = 0;
-        birdSounds[bird].play();
-    }catch(e){
-        console.log("Audio error:",e);
-    }
-}
+    // --- Play sound safely on GitHub ---
+    const sound = birdSounds[bird];
+    sound.currentTime = 0;
 
+    sound.play().catch(e=>{
+        console.log("⚠ Sound blocked, waiting for unlock click", e);
+    });
+}
 
 // Keyboard jump (PC)
 document.addEventListener("keydown", ()=> jump(lift));
