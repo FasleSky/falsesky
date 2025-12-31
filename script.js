@@ -44,7 +44,7 @@ let bg=new Image(); bg.src=bgSrc;
 let birdHitbox = 25;   // collision box (unchanged small size)
 let birdDisplay = 160;  // visual size (increase or tune later)
 let birdX=100,birdY=250,vel=0,gravity=0.35,lift=-5.1;
-let liftMobile = -7.5;   // more powerful tap jump
+let liftMobile = -8;   // more powerful tap jump
 let pipes=[],score=0,run=false,bird=0;
 
 /* --- UI BUTTONS --- */
@@ -147,4 +147,5 @@ function end(){
     run=false;
     over.style.display="block";
 }
+
 
