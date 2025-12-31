@@ -222,6 +222,35 @@
   .nav-links{ display:none; }
   .hamburger{ display:block; }
 }
+/* Universal responsive rules */
+body{
+  margin:0;
+  padding:0;
+  overflow-x:hidden;
+}
+
+/* Text responsiveness */
+h1, h2, h3, p {
+  max-width:100%;
+  word-wrap:break-word;
+}
+
+/* Images, canvas, sections shrink on phone */
+img, canvas {
+  max-width:100%;
+  height:auto;
+}
+
+/* Hero container responsiveness */
+.hero{
+  padding:20px;
+  text-align:center;
+}
+
+@media(max-width:768px){
+  .hero h1 { font-size:26px; }
+  .hero p { font-size:16px; }
+}
 
     </style>
 </head>

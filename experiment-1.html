@@ -1,317 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Experiment 1: 20+ Mathematical Wonders</title>
-    <style>
-        body { margin: 0; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; }
-        canvas { display: block; touch-action: none; }
-
-        #popup-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 100;
-        }
-
-        #guidance-pop {
-            position: relative;
-            background: linear-gradient(145deg, #0a0a0a, #1a1a2e);
-            padding: 30px; border-radius: 20px;
-            text-align: center; color: white;
-            box-shadow: 0 0 50px rgba(0, 255, 255, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            max-width: 350px;
-        }
-
-        #guidance-pop h2 { color: #00ffcc; margin-top: 0; font-weight: 300; }
-        #close-btn {
-            position: absolute; top: 10px; right: 15px;
-            background: none; border: none; color: #fff;
-            font-size: 24px; cursor: pointer;
-        }
-        #shape-name {
-            position: fixed; bottom: 20px; width: 100%; text-align: center;
-            color: rgba(255,255,255,0.5); font-size: 0.9rem; letter-spacing: 2px;
-            pointer-events: none; text-transform: uppercase;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flappy Bird</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div id="popup-overlay">
-        <div id="guidance-pop">
-            <button id="close-btn">&times;</button>
-            <h2>Experiment 1</h2>
-            <p><b>PC:</b> Left Click (Color) | Right Click (Burst/Morph) | Hold (Rotate)</p>
-            <p><b>Mobile:</b> Tap (Magic) | Drag (Rotate)</p>
-        </div>
+<!-- MAIN MENU -->
+<div id="menu">
+    <h1>FLAPPY BIRD</h1>
+    <button id="play">PLAY</button>
+    <button id="characters">CHARACTERS</button>
+</div>
+
+<!-- CHARACTER MENU -->
+<div id="charMenu">
+    <h2>Select Bird</h2>
+    <div id="skins">
+        <img src="https://i.ibb.co/cKWYWR3z/Untitled-Project-12.png" data-id="1">
+        <img src="https://i.ibb.co/0jLLJ15q/Untitled-Project-1.png" data-id="2">
+        <img src="https://i.ibb.co/XkKdpVp7/Untitled-Project-2.png" data-id="3">
+        <img src="https://i.ibb.co/Y7fTWKTf/Untitled-Project-1-removebg-preview.png" data-id="4">
     </div>
-    <div id="shape-name">Sphere</div>
+    <button id="back">BACK</button>
+</div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<!-- GAME -->
+<div id="wrapper">
+    <canvas id="game" width="450" height="600"></canvas>
+    <div id="score">0</div>
+</div>
 
-    <script>
-        let scene, camera, renderer, particles, geometry;
-        const particleCount = 20000; 
-        let shapes = [];
-        let shapeLabels = ["Sphere", "Heart", "Saturn", "Butterfly", "Humanoid", "DNA Helix", "Torus Knot", "Infinity", "Flower", "Snowflake", "Pyramid", "Cube", "Cylinder", "Hypersphere", "Star", "Fireworks", "Galaxy", "Hourglass", "Spider Web", "Atom", "Tornado"];
-        let currentShapeIndex = 0;
-        
-        let isDragging = false;
-        let previousMousePosition = { x: 0, y: 0 };
-        let mouseDownTime = 0;
+<!-- GAME OVER BOX -->
+<div id="gameOver">
+    <h2>Game Over NOOB</h2>
+    <button id="retry">RETRY</button>
+</div>
 
-        function init() {
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 12;
-
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            document.body.appendChild(renderer.domElement);
-
-            geometry = new THREE.BufferGeometry();
-            const posArray = new Float32Array(particleCount * 3);
-            const colorArray = new Float32Array(particleCount * 3);
-
-            for (let i = 0; i < particleCount * 3; i++) {
-                posArray[i] = (Math.random() - 0.5) * 50;
-                colorArray[i] = 1;
-            }
-
-            geometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-            geometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
-
-            const material = new THREE.PointsMaterial({
-                size: 0.03, vertexColors: true, transparent: true,
-                blending: THREE.AdditiveBlending, depthWrite: false
-            });
-
-            particles = new THREE.Points(geometry, material);
-            scene.add(particles);
-
-            generateAllShapes();
-            addListeners();
-            animate();
-            morphTo(0, false);
-        }
-
-        // --- THE MATHEMATICAL ENGINE (20+ SHAPES) ---
-        function generateAllShapes() {
-            const add = (fn) => shapes.push(fn());
-
-            // 1. Sphere
-            add(() => getPoints((i, t) => {
-                const phi = Math.acos(-1 + (2 * i) / particleCount);
-                const theta = Math.sqrt(particleCount * Math.PI) * phi;
-                return [5 * Math.cos(theta) * Math.sin(phi), 5 * Math.sin(theta) * Math.sin(phi), 5 * Math.cos(phi)];
-            }));
-            // 2. Heart
-            add(() => getPoints((i, t) => {
-                const a = Math.random() * Math.PI * 2;
-                return [0.3 * (16 * Math.pow(Math.sin(a), 3)), 0.3 * (13 * Math.cos(a) - 5 * Math.cos(2*a) - 2 * Math.cos(3*a) - Math.cos(4*a)), (Math.random()-0.5)*2];
-            }));
-            // 3. Saturn
-            add(() => getPoints((i, t) => {
-                if(i < particleCount*0.5) {
-                    const phi = Math.random()*Math.PI*2, theta = Math.random()*Math.PI;
-                    const r = Math.random()*3;
-                    return [r*Math.sin(theta)*Math.cos(phi), r*Math.sin(theta)*Math.sin(phi), r*Math.cos(theta)];
-                } else {
-                    const r = 5 + Math.random()*2, a = Math.random()*Math.PI*2;
-                    return [r*Math.cos(a), (Math.random()-0.5)*0.5, r*Math.sin(a)];
-                }
-            }));
-            // 4. Butterfly
-            add(() => getPoints((i, t) => {
-                const a = Math.random()*Math.PI*2;
-                const r = Math.exp(Math.cos(a)) - 2*Math.cos(4*a) - Math.pow(Math.sin(a/12), 5);
-                return [r*Math.sin(a)*1.5, r*Math.cos(a)*1.5, (Math.random()-0.5)*2];
-            }));
-            // 5. Humanoid
-            add(() => getPoints((i, t) => {
-                let x,y,z, p = Math.random();
-                if(p<0.2) { x=(Math.random()-0.5)*1.5; y=(Math.random()-0.5)*4; z=(Math.random()-0.5)*1; } // Torso
-                else if(p<0.4) { x=(Math.random()-0.5); y=2.5+(Math.random()); z=(Math.random()-0.5); } // Head
-                else if(p<0.7) { x=(Math.random()-0.5)*9; y=1.5; z=0; } // Arms
-                else { x=(Math.random()<0.5?-1:1); y=-2-(Math.random()*4); z=0; } // Legs
-                return [x,y,z];
-            }));
-            // 6. DNA Helix
-            add(() => getPoints((i, t) => {
-                const a = (i / particleCount) * Math.PI * 20;
-                const side = Math.random() > 0.5 ? 1 : -1;
-                return [side * 2 * Math.cos(a), a - 10, side * 2 * Math.sin(a)];
-            }));
-            // 7. Torus Knot
-            add(() => getPoints((i, t) => {
-                const a = (i / particleCount) * Math.PI * 2;
-                const p=2, q=3;
-                const r = Math.cos(q*a) + 2;
-                return [r*Math.cos(p*a)*2, r*Math.sin(p*a)*2, -Math.sin(q*a)*2];
-            }));
-            // 8. Infinity
-            add(() => getPoints((i, t) => {
-                const a = (i/particleCount)*Math.PI*2;
-                const s = 10 / (3 - Math.cos(2*a));
-                return [s*Math.cos(a), s*Math.sin(2*a)/2, (Math.random()-0.5)*2];
-            }));
-            // 9. Flower (Rose Curve)
-            add(() => getPoints((i, t) => {
-                const a = Math.random()*Math.PI*2;
-                const k = 5;
-                const r = 5 * Math.cos(k*a);
-                return [r*Math.cos(a), r*Math.sin(a), (Math.random()-0.5)];
-            }));
-            // 10. Snowflake
-            add(() => getPoints((i, t) => {
-                const arm = Math.floor(Math.random()*6);
-                const r = Math.random()*6;
-                const a = (arm * Math.PI/3) + (Math.random()-0.5)*0.2;
-                return [r*Math.cos(a), r*Math.sin(a), (Math.random()-0.5)*0.5];
-            }));
-            // 11. Pyramid
-            add(() => getPoints((i, t) => {
-                const y = (Math.random()-0.5)*6;
-                const s = (3 - y/2);
-                const a = Math.floor(Math.random()*4) * Math.PI/2;
-                return [s*Math.cos(a)*Math.random(), y, s*Math.sin(a)*Math.random()];
-            }));
-            // 12. Cube
-            add(() => getPoints((i, t) => [(Math.random()-0.5)*8, (Math.random()-0.5)*8, (Math.random()-0.5)*8]));
-            // 13. Cylinder
-            add(() => getPoints((i, t) => {
-                const a = Math.random()*Math.PI*2;
-                const r = 4;
-                return [r*Math.cos(a), (Math.random()-0.5)*10, r*Math.sin(a)];
-            }));
-            // 14. Hypersphere (Double Ring)
-            add(() => getPoints((i, t) => {
-                const a = Math.random()*Math.PI*2;
-                return i % 2 === 0 ? [6*Math.cos(a), 6*Math.sin(a), 0] : [0, 6*Math.cos(a), 6*Math.sin(a)];
-            }));
-            // 15. Star
-            add(() => getPoints((i, t) => {
-                const a = Math.random()*Math.PI*2;
-                const r = (i%2===0) ? 6 : 2;
-                const step = Math.PI/5;
-                const angle = Math.floor(a/step)*step;
-                return [r*Math.cos(angle), r*Math.sin(angle), (Math.random()-0.5)];
-            }));
-            // 16. Fireworks
-            add(() => getPoints((i, t) => {
-                const r = Math.random()*10;
-                const a = Math.random()*Math.PI*2;
-                return [r*Math.cos(a), r*Math.sin(a), r*Math.tan(a)*0.1];
-            }));
-            // 17. Galaxy
-            add(() => getPoints((i, t) => {
-                const a = Math.random()*Math.PI*10;
-                const r = a * 0.5;
-                return [r*Math.cos(a), (Math.random()-0.5)*2, r*Math.sin(a)];
-            }));
-            // 18. Hourglass
-            add(() => getPoints((i, t) => {
-                const y = (Math.random()-0.5)*10;
-                const r = Math.abs(y)*0.8;
-                const a = Math.random()*Math.PI*2;
-                return [r*Math.cos(a), y, r*Math.sin(a)];
-            }));
-            // 19. Spider Web
-            add(() => getPoints((i, t) => {
-                const rings = Math.floor(Math.random()*10);
-                const a = Math.random()*Math.PI*2;
-                return [rings*Math.cos(a), rings*Math.sin(a), 0];
-            }));
-            // 20. Atom
-            add(() => getPoints((i, t) => {
-                const a = Math.random()*Math.PI*2;
-                const orb = i % 3;
-                if(orb===0) return [Math.cos(a)*6, Math.sin(a)*6, 0];
-                if(orb===1) return [Math.cos(a)*6, 0, Math.sin(a)*6];
-                return [0, Math.cos(a)*6, Math.sin(a)*6];
-            }));
-             // 21. Tornado
-             add(() => getPoints((i, t) => {
-                const y = (i/particleCount)*12 - 6;
-                const r = (y+6)*0.5;
-                const a = y * 4;
-                return [r*Math.cos(a), y, r*Math.sin(a)];
-            }));
-        }
-
-        function getPoints(formula) {
-            const arr = new Float32Array(particleCount * 3);
-            for(let i=0; i<particleCount; i++) {
-                const p = formula(i);
-                arr[i*3] = p[0]; arr[i*3+1] = p[1]; arr[i*3+2] = p[2];
-            }
-            return arr;
-        }
-
-        // --- CORE ACTIONS ---
-        function morphTo(index, isBurst) {
-            document.getElementById('shape-name').innerText = shapeLabels[index];
-            const posAttr = geometry.attributes.position;
-            if(isBurst) {
-                for(let i=0; i<particleCount*3; i++) posAttr.array[i] += (Math.random()-0.5)*15;
-            }
-            gsap.to(posAttr.array, {
-                endArray: shapes[index], duration: 2, ease: "power4.inOut",
-                onUpdate: () => posAttr.needsUpdate = true
-            });
-        }
-
-        function changeColor() {
-            const colAttr = geometry.attributes.color;
-            const newCol = new THREE.Color(`hsl(${Math.random() * 360}, 100%, 60%)`);
-            for(let i=0; i<particleCount; i++) {
-                gsap.to(colAttr.array, { [i*3]: newCol.r, [i*3+1]: newCol.g, [i*3+2]: newCol.b, duration: 1 });
-            }
-            colAttr.needsUpdate = true;
-        }
-
-        function addListeners() {
-            window.addEventListener('contextmenu', e => e.preventDefault());
-            window.addEventListener('pointerdown', (e) => {
-                if(e.target.id === 'close-btn') return;
-                isDragging = true; mouseDownTime = Date.now();
-                previousMousePosition = { x: e.clientX, y: e.clientY };
-            });
-            window.addEventListener('pointerup', (e) => {
-                isDragging = false;
-                if (Date.now() - mouseDownTime < 200) {
-                    if (e.pointerType === 'mouse') {
-                        if (e.button === 0) changeColor();
-                        if (e.button === 2) { currentShapeIndex = (currentShapeIndex+1)%shapes.length; morphTo(currentShapeIndex, true); }
-                    } else {
-                        Math.random() > 0.5 ? changeColor() : (currentShapeIndex = (currentShapeIndex+1)%shapes.length, morphTo(currentShapeIndex, true));
-                    }
-                }
-            });
-            window.addEventListener('pointermove', (e) => {
-                if (isDragging) {
-                    particles.rotation.y += (e.clientX - previousMousePosition.x) * 0.01;
-                    particles.rotation.x += (e.clientY - previousMousePosition.y) * 0.01;
-                    previousMousePosition = { x: e.clientX, y: e.clientY };
-                }
-            });
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-            if(!isDragging) particles.rotation.y += 0.002;
-            renderer.render(scene, camera);
-        }
-
-        document.getElementById('close-btn').addEventListener('click', () => {
-            document.getElementById('popup-overlay').style.display = 'none';
-            init();
-        });
-    </script>
+<script src="script.js"></script>
 </body>
 </html>

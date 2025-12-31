@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
     <title>About | False Realm</title>
 
@@ -166,53 +165,21 @@
     color: #1f2937;
     font-size: 14px;
 }
-/* NAVBAR STYLING */
-.navbar{
-  display:flex; justify-content:space-between; align-items:center;
-  padding:15px 25px; color:white; background:rgba(0,0,0,0.6);
-  position:fixed; top:0; width:100%; z-index:10;
-}
-
-.nav-links{ list-style:none; display:flex; gap:25px; }
-.nav-links a{ text-decoration:none; color:white; font-size:18px; }
-
-.hamburger{ display:none; font-size:28px; cursor:pointer; }
-
-/* Mobile menu defaults hidden */
-.mobile-menu{ display:none; flex-direction:column; padding:10px; background:rgba(0,0,0,0.9); }
-.mobile-menu a{ color:white; padding:8px 0; }
-
-/* Responsive behavior */
-@media(max-width:768px){
-  .nav-links{ display:none; }
-  .hamburger{ display:block; }
-}
 
     </style>
 </head>
 <body>
-    <!-- NEW RESPONSIVE NAVBAR START -->
-<nav class="navbar">
-  <div class="logo">FALSE REALM</div>
 
-  <!-- Desktop menu -->
-  <ul class="nav-links">
-    <li><a href="index.html">Home</a></li>
-    <li><a href="experiments.html">Experiments</a></li>
-    <li><a href="about.html">About</a></li>
-  </ul>
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="logo">False Realm</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="experiments.html">Experiments</a>
+            <a href="about.html">About</a>
+        </div>
+    </div>
 
-  <!-- Hamburger for mobile -->
-  <div class="hamburger" onclick="toggleMenu()">&#9776;</div>
-
-  <!-- Hidden mobile menu -->
-  <ul class="mobile-menu" id="mobileMenu">
-    <li><a href="index.html">Home</a></li>
-    <li><a href="experiments.html">Experiments</a></li>
-    <li><a href="about.html">About</a></li>
-  </ul>
-</nav>
-<!-- NEW RESPONSIVE NAVBAR END -->
     <!-- ABOUT CONTENT -->
     <div class="about-wrapper">
     <div class="envelope">
@@ -304,12 +271,6 @@
         input.value = "";
         renderFeedback();
     });
-</script>
-<script>
-function toggleMenu(){
-  const menu = document.getElementById("mobileMenu");
-  menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
-}
 </script>
 
 </body>
