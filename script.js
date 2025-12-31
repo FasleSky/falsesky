@@ -1,5 +1,4 @@
 const birdSkins=[
- "https://i.ibb.co/Tx18hNjp/download-1-removebg-preview.png",
  "https://i.ibb.co/cKWYWR3z/Untitled-Project-12.png",
  "https://i.ibb.co/0jLLJ15q/Untitled-Project-1.png",
  "https://i.ibb.co/XkKdpVp7/Untitled-Project-2.png",
@@ -7,7 +6,6 @@ const birdSkins=[
 ];
 // AUDIO for each bird (one sound per character)
 const birdSounds = [
-    new Audio("sounds/bsound1.mp3"),  // sound for Bird 1
     new Audio("sounds/bs(clumsy).mp3"),  // sound for Bird 2
     new Audio("sounds/bs(pere).mp3"),   // sound for Bird 3
     new Audio("sounds/bs(raju).mp3"),
@@ -32,7 +30,8 @@ let bg=new Image(); bg.src=bgSrc;
 
 let birdHitbox = 40;   // collision box (unchanged small size)
 let birdDisplay = 190;  // visual size (increase or tune later)
-let birdX=100,birdY=250,vel=0,gravity=0.35,lift=-4.7;
+let birdX=100,birdY=250,vel=0,gravity=0.35,lift=-5.1;
+let liftMobile = -7.5;   // more powerful tap jump
 let pipes=[],score=0,run=false,bird=0;
 
 /* --- UI BUTTONS --- */
@@ -54,8 +53,8 @@ document.getElementById("back").onclick=()=>{
 
 document.querySelectorAll("#skins img").forEach(i=>{
     i.onclick=()=>{
-        bird=i.getAttribute("data-id");
-        alert("Bird Selected!");
+       bird = parseInt(i.getAttribute("data-id"));
+       alert("Bird Selected!");
     }
 });
 
@@ -110,20 +109,27 @@ function pipeLoop(){
 }
 
 /* CONTROLS */
-function jump(){
+function jump(power){
     if(!run) return;
 
-    vel = lift;
+    vel = power;
 
-    // play respective sound per selected bird
-    let sound = birdSounds[bird];
-    sound.pause();
-    sound.currentTime = 0;
-    sound.play();
+    // Play sound for selected bird
+    try{
+        birdSounds[bird].pause();
+        birdSounds[bird].currentTime = 0;
+        birdSounds[bird].play();
+    }catch(e){
+        console.log("Audio error:",e);
+    }
 }
 
-document.addEventListener("keydown", jump);
-document.addEventListener("click", jump);
+
+// Keyboard jump (PC)
+document.addEventListener("keydown", ()=> jump(lift));
+
+// Touch / tap / click jump (mobile)
+document.addEventListener("click", ()=> jump(liftMobile));
 
 /* END */
 function end(){
