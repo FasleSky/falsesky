@@ -6,11 +6,24 @@ const birdSkins=[
 ];
 // AUDIO for each bird (one sound per character)
 const birdSounds = [
-    new Audio("sounds/bs(clumsy).mp3"),  // sound for Bird 2
-    new Audio("sounds/bs(pere).mp3"),   // sound for Bird 3
-    new Audio("sounds/bs(raju).mp3"),
-    new Audio("sounds/bs(sia).mp3")
+    new Audio("sounds/bs_clumsy.mp3"),  // sound for Bird 2
+    new Audio("sounds/bs_pere.mp3"),   // sound for Bird 3
+    new Audio("sounds/bs_raju.mp3"),
+    new Audio("sounds/bs_sia.mp3")
 ];
+// --------- Audio Unlock for GitHub & Browsers ----------
+let audioUnlocked = false;
+
+document.addEventListener("click", () => {
+    if (!audioUnlocked) {
+        birdSounds.forEach(sound => {
+            sound.volume = 1;         // optional: set sound volume to full
+            sound.play().then(() => sound.pause()); // play then pause to unlock
+        });
+        audioUnlocked = true;
+        console.log("Audio unlocked!");
+    }
+});
 
 const pipeUp="https://i.ibb.co/6R7g7dSn/pipe-bottom.png";
 const pipeDown="https://i.ibb.co/XfNG6d2t/pipe-top.png";
